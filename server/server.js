@@ -7,6 +7,7 @@ dotenv.config();
 
 const config = require('./config/config');
 const { testConnection } = require('./config/database');
+const db = require('./models');
 
 const app = express();
 
@@ -26,6 +27,31 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
+// Ruta de prueba para los modelos
+app.get('/test-models', async (req, res) => {
+    try {
+        // Contar usuarios
+        const userCount = await db.User.count();
+        const productCount = await db.Product.count();
+        const categoryCount = await db.Category.count();
+
+        res.json({
+            success: true,
+            message: 'Modelos funcionando correctamente',
+            counts: {
+                users: userCount,
+                products: productCount,
+                categories: categoryCount
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            error: error.message
+        });
+    }
+});
+
 /**
     * RUTAS
     * Ruta de prueba
@@ -35,17 +61,9 @@ app.get('/', (req, res) => {
         message: '🚀 API funcionando',
         version: '1.0.0',
         endpoints: {
-            health: '/health',
+            testModels: '/test-models'
             // Endpoints adicionales
         }
-    });
-});
-
-// Status de servidor
-app.get('/health', (req, res) => {
-    res.json({ 
-        status: 'OK', 
-        timestamp: new Date().toISOString() 
     });
 });
 
