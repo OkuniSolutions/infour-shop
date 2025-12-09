@@ -27,7 +27,7 @@ app.use(express.urlencoded({ extended: true }));
 
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-// Ruta de prueba para los modelos
+// Rutas de prueba
 app.get('/test-models', async (req, res) => {
     try {
         // Contar usuarios
@@ -52,6 +52,30 @@ app.get('/test-models', async (req, res) => {
     }
 });
 
+app.get('/protected', 
+    require('./middleware').authMiddleware,
+    (req, res) => {
+        res.json({
+            success: true,
+            message: '¡Acceso autorizado!',
+            user: req.user
+        });
+    }
+);
+
+// Ruta solo para admins
+app.get('/admin-only',
+    require('./middleware').authMiddleware,
+    require('./middleware').isAdmin,
+    (req, res) => {
+        res.json({
+            success: true,
+            message: 'Bienvenido, administrador',
+            user: req.user
+        });
+    }
+);
+
 /**
     * RUTAS
     * Ruta de prueba
@@ -61,7 +85,9 @@ app.get('/', (req, res) => {
         message: '🚀 API funcionando',
         version: '1.0.0',
         endpoints: {
-            testModels: '/test-models'
+            testModels: '/test-models',
+            protected: '/protected',
+            adminOnly: '/admin-only'
             // Endpoints adicionales
         }
     });
