@@ -29,6 +29,7 @@ desktop.ini
 *.ntvs*
 *.njsproj
 *.sln
+CLAUDE.md
 
 # Archivos subidos
 server/uploads/
